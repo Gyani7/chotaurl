@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Neon glow text */
+.neon-text {
+  text-shadow: 0 0 5px #a855f7, 0 0 10px #a855f7, 0 0 20px #a855f7;
+}
+
+/* Neon border */
+.neon-border {
+  border: 2px solid #a855f7;
+  box-shadow: 0 0 10px #a855f7;
+}
+
+/* Glassmorphism card */
+.glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Animated button */
+.neon-button {
+  background: linear-gradient(90deg, #a855f7, #3b82f6);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+.neon-button:hover {
+  box-shadow: 0 0 15px #a855f7, 0 0 25px #3b82f6;
+  transform: scale(1.05);
+}
