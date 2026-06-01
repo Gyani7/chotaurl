@@ -3,9 +3,17 @@ import type { NextRequest } from 'next/server';
 
 export function middleware(req: NextRequest) {
   const token = req.cookies.get('sb-access-token');
-  const isAdminRoute = req.nextUrl.pathname.startsWith('/admin');
+  const { pathname } = req.nextUrl;
 
-  if (isAdminRoute && !token) {
+  // Protect dashboard and admin routes
+  if ((pathname.startsWith('/dashboard') || pathname.startsWith('/admin')) && !token) {
     return NextResponse.redirect(new URL('/login', req.url));
   }
+
+  // SEO-friendly: force HTTPS + canonical domain
+  if (req.nextUrl.protocol !== 'https:') {
+    return NextResponse.redirect(`https://chotaurl.pro${pathname}`);
+  }
+
+  return NextResponse.next();
 }
