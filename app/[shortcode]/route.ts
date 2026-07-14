@@ -72,6 +72,36 @@ async function getLink(slug: string) {
   return link;
 }
 
+function getDemoLink(request: NextRequest, slug: string): LinkRow | null {
+  const value = request.cookies.get(`cu_demo_${slug}`)?.value;
+  if (!value) return null;
+  try {
+    const base64 = value.replace(/-/g, "+").replace(/_/g, "/").padEnd(
+      Math.ceil(value.length / 4) * 4,
+      "=",
+    );
+    const bytes = Uint8Array.from(atob(base64), (character) => character.charCodeAt(0));
+    const destination = new TextDecoder().decode(bytes);
+    const url = new URL(destination);
+    if (!["http:", "https:"].includes(url.protocol)) return null;
+    return {
+      id: `demo_${slug}`,
+      slug,
+      destination,
+      status: "ACTIVE",
+      password_hash: null,
+      expires_at: null,
+      max_clicks: null,
+      click_count: 0,
+      traffic_share_percent: 0,
+      targeting: null,
+      utm: null,
+    };
+  } catch {
+    return null;
+  }
+}
+
 function deviceFromAgent(userAgent: string) {
   if (/tablet|ipad/i.test(userAgent)) return "tablet";
   if (/mobile|android|iphone/i.test(userAgent)) return "mobile";
@@ -181,7 +211,7 @@ export async function GET(
   context: { params: Promise<{ shortcode: string }> },
 ) {
   const { shortcode } = await context.params;
-  const link = await getLink(shortcode);
+  const link = (await getLink(shortcode)) ?? getDemoLink(request, shortcode);
   if (!link) {
     return NextResponse.redirect(new URL(`/link-not-found?slug=${shortcode}`, request.url));
   }

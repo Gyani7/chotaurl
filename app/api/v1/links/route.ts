@@ -65,7 +65,7 @@ export async function POST(request: Request) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? new URL(request.url).origin;
 
   if (!process.env.DATABASE_URL) {
-    return NextResponse.json(
+    const response = NextResponse.json(
       {
         data: {
           id: `demo_${slug}`,
@@ -78,6 +78,18 @@ export async function POST(request: Request) {
       },
       { status: 201 },
     );
+    response.cookies.set(
+      `cu_demo_${slug}`,
+      Buffer.from(input.destination).toString("base64url"),
+      {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 60 * 60,
+        path: `/${slug}`,
+      },
+    );
+    return response;
   }
 
   const principal = await getApiPrincipal(request);
